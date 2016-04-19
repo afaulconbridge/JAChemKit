@@ -1,0 +1,4 @@
+JAChemKit
+---------
+
+A Java toolkit for artificial chemistries. This is arranged as a Maven project with submodules for different libraries and chemistries.
