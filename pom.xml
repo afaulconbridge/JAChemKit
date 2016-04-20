@@ -16,14 +16,21 @@
 
 	<properties>
 		<java.version>1.8</java.version>
+		<jachemkit.version>0.0.1-SNAPSHOT</jachemkit.version>
 	</properties>
 
 	<modules>
 		<module>core</module>
+		<module>hashchem</module>
 	</modules>
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>jachemkit</groupId>
+				<artifactId>core</artifactId>
+				<version>${jachemkit.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
