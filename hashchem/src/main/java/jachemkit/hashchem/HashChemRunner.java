@@ -6,10 +6,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.jgrapht.Graph;
+import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
@@ -20,6 +23,9 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.ImmutableList;
 
+import jachemkit.core.Atom;
+import jachemkit.core.Molecule;
+
 @Component
 public class HashChemRunner implements CommandLineRunner {
 
@@ -27,13 +33,23 @@ public class HashChemRunner implements CommandLineRunner {
 	
 	@Override
 	public void run(String... args) throws Exception {
+
+		//create a random moleucle
+		Molecule<String> mol = new Molecule<>();
+		Atom<String> a = new Atom<String>("A");
+		Atom<String> b = new Atom<String>("B");
+		mol.addVertex(a);
+		mol.addVertex(b);
+		mol.addEdge(a,b);
+		//test if it is stable
+		getBreakingEdges(mol);
 		
+		/*
 		SimpleGraph<Atom<String>, DefaultEdge> molA = new SimpleGraph<>(DefaultEdge.class);
 		SimpleGraph<Atom<String>, DefaultEdge> molB = new SimpleGraph<>(DefaultEdge.class);
 		
 		molA.addVertex(new Atom<String>("A"));
 		molB.addVertex(new Atom<String>("B"));
-		
 		
 		//now do an actual reaction
 		for (Atom<String> atomA: molA.vertexSet()) {
@@ -45,6 +61,28 @@ public class HashChemRunner implements CommandLineRunner {
 				log.info("score = "+score);
 			}
 		}
+		*/
+	}
+	
+	private Set<DefaultEdge> getBreakingEdges(Molecule<String> mol) {
+		if (!(new ConnectivityInspector(mol)).isGraphConnected()) {
+			throw new IllegalArgumentException("Must be a single connected component");
+		}
+		
+		Set<DefaultEdge> breakingEdges = new HashSet<>();
+		for (DefaultEdge e : new HashSet<>(mol.edgeSet())) {
+			Atom<String> source = mol.getEdgeSource(e);
+			Atom<String> target = mol.getEdgeTarget(e);
+			//test if this edge can break
+			//remove it
+			mol.removeEdge(e);
+			//evaluate
+			int diff = getHashDiff(getHash(mol, source), getHash(mol, target));
+			log.info("diff = "+diff);
+			//return
+			mol.addEdge(source, target);
+		}
+		return breakingEdges;
 	}
 	
 	private Integer getHashDiff(List<Byte> hashA, List<Byte> hashB) {
@@ -60,36 +98,36 @@ public class HashChemRunner implements CommandLineRunner {
 	}
 	
 	private List<Byte> getHash(Graph<Atom<String>,DefaultEdge> graph, Atom<String> start) {
-		MessageDigest md;
+		//if the hashing is order sensitive (md5) need this to iterate in a reliable and consistent manner 
+		//  this doesnt because it uses set and its hard to order arbitrary graph nodes
+		//so use a order independent (commutative) hashing algorithm (e.g. addition with overflow)
+		//  then we dont care about the ordering of nodes
+		//    but then the structure of the graph wont matter, only content
+		byte[] hash;
 		try {
-			md = MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e) {
+		hash = start.body.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e) {
 			//swallow exception because it should never happen
 			throw new RuntimeException(e);
 		}
-		
 		Iterator<Atom<String>> it = new DepthFirstIterator<Atom<String>,DefaultEdge>(graph,start);
 		while(it.hasNext()) {
 			Atom<String> next = it.next();
+			byte[] nextHash;
 			try {
-				md.update(next.t.getBytes("UTF-8"));
+				nextHash = next.body.getBytes("UTF-8");
 			} catch (UnsupportedEncodingException e) {
 				//swallow exception because it should never happen
 				throw new RuntimeException(e);
 			}
+			for (int i = 0; i < hash.length; i++) {
+				hash[i] += nextHash[i];
+			}
 		}
-		byte[] hash = md.digest();
 		List<Byte> listHash = new ArrayList<>(hash.length);
 		for (int i = 0; i < hash.length; i++) {
 			listHash.add(new Byte(hash[i]));
 		}
 		return Collections.unmodifiableList(listHash);
-	}
-	
-	private class Atom<T>{
-		public final T t;
-		public Atom(T t){
-			this.t = t;
-		}
 	}
 }
