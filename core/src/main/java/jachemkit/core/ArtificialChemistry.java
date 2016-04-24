@@ -5,11 +5,11 @@ import java.util.Random;
 import org.springframework.stereotype.Component;
 
 @Component
-public interface ArtificialChemistry {
+public interface ArtificialChemistry<M> {
 
-	public default Molecule createRandomMolecule(){
+	public default M createRandomMolecule(){
 		return createRandomMolecule(new Random());
 	}
 	
-	public Molecule createRandomMolecule(Random rng);
+	public M createRandomMolecule(Random rng);
 }

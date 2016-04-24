@@ -9,14 +9,13 @@ import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.generate.GraphGenerator;
 import org.jgrapht.generate.RandomGraphGenerator;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jachemkit.core.ArtificialChemistry;
-import jachemkit.core.Atom;
-import jachemkit.core.Molecule;
 
-public class HashChemistry implements ArtificialChemistry {
+public class HashChemistry implements ArtificialChemistry<HashMolecule> {
 	
 	private Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -32,17 +31,21 @@ public class HashChemistry implements ArtificialChemistry {
 	}
 	
 	@Override
-	public Molecule<List<Byte>> createRandomMolecule(Random rng) {
-		Molecule<List<Byte>> mol = null;
+	public HashMolecule createRandomMolecule(Random rng) {
+		int noAtoms = 16;
+		int noEdges = noAtoms + (noAtoms/2);
+		HashMolecule mol = null;
 		while (mol == null) {
 			log.info("Generating molecule...");
-			mol = new Molecule<>();
-			GraphGenerator<Atom<List<Byte>>,DefaultEdge,?> gen = new RandomGraphGenerator<>(16,24, rng.nextLong());
+			SimpleGraph<HashAtom,DefaultEdge> structure = new SimpleGraph<HashAtom,DefaultEdge>(DefaultEdge.class);
+					
+			GraphGenerator<HashAtom,DefaultEdge,?> gen = new RandomGraphGenerator<>(noAtoms,noEdges, rng.nextLong());
 			try {
-				gen.generateGraph(mol, ()-> new Atom<>(getRandomByteList(rng)), null);
-				if (!(new ConnectivityInspector<Atom<List<Byte>>,DefaultEdge>(mol)).isGraphConnected()) {
+				gen.generateGraph(structure, ()-> new HashAtom(getRandomByteList(rng)), null);
+				if (!(new ConnectivityInspector<HashAtom,DefaultEdge>(structure)).isGraphConnected()) {
 					throw new IllegalArgumentException("Must be a single connected component");
 				}
+				mol = HashMolecule.createFrom(structure);
 			} catch (IllegalArgumentException e) {
 				//thrown either if try to randomly create self-edges (loops) or multiple components
 				mol = null;

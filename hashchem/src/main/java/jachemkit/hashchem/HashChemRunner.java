@@ -13,6 +13,7 @@ import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.generate.GraphGenerator;
 import org.jgrapht.generate.RandomGraphGenerator;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
 import org.jgrapht.graph.builder.UndirectedGraphBuilder;
 import org.jgrapht.graph.builder.UndirectedGraphBuilderBase;
 import org.jgrapht.traverse.DepthFirstIterator;
@@ -24,13 +25,9 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
-import jachemkit.core.Atom;
-import jachemkit.core.Molecule;
-
 @Component
 public class HashChemRunner implements CommandLineRunner {
 
-	private static final int BREAKDIFF = 64;
 	
 	private Logger log = LoggerFactory.getLogger(this.getClass());
 	
@@ -44,7 +41,7 @@ public class HashChemRunner implements CommandLineRunner {
 		//create a random molecule
 		
 		for (int i=0; i < 128; i++) {
-			Molecule<List<Byte>> mol = hashChemistry.createRandomMolecule(rng);
+			HashMolecule mol = hashChemistry.createRandomMolecule(rng);
 			//test if it is stable
 			//getBreakingEdges(mol);
 			testStability(mol);
@@ -80,12 +77,10 @@ public class HashChemRunner implements CommandLineRunner {
 		*/
 	}
 	
-	private Multiset<Molecule<List<Byte>>> testStability(Molecule<List<Byte>> mol) {
+	private Multiset<HashMolecule> testStability(HashMolecule mol) {
 		log.info("Starting stability test...");
-		log.info("Old molecule has "+mol.edgeSet().size()+" edges");
-		log.info("Old molecule has "+mol.vertexSet().size()+" atoms");
-		Multiset<Molecule<List<Byte>>> toReturn = HashMultiset.create();
-		Set<DefaultEdge> brokenEdges = getBreakingEdges(mol);
+		Multiset<HashMolecule> toReturn = HashMultiset.create();
+		Set<DefaultEdge> brokenEdges = mol.getBreakingEdges();
 		log.info(""+brokenEdges.size()+" edges broke");
 		if (brokenEdges.size() == 0) {
 			//nothing broke
@@ -93,96 +88,51 @@ public class HashChemRunner implements CommandLineRunner {
 			toReturn.add(mol);
 		} else {
 			//something broke
-			mol.removeAllEdges(brokenEdges);
+			//create a simple graph so we can modify it
+			SimpleGraph<HashAtom,DefaultEdge> testGraph = new SimpleGraph<HashAtom,DefaultEdge>(DefaultEdge.class);
+			for (HashAtom atom : mol.structure.vertexSet()) {
+				testGraph.addVertex(atom);
+			}
+			for (DefaultEdge e : mol.structure.edgeSet()) {
+				HashAtom sourceAtom = mol.structure.getEdgeSource(e);
+				HashAtom targetAtom = mol.structure.getEdgeTarget(e);
+				testGraph.addEdge(sourceAtom, targetAtom, e);
+			}
 			
-			ConnectivityInspector<Atom<List<Byte>>,DefaultEdge> connectivityInspector = new ConnectivityInspector<>(mol);
-			List<Set<Atom<List<Byte>>>> atomSets = connectivityInspector.connectedSets();
+			testGraph.removeAllEdges(brokenEdges);
+			
+			ConnectivityInspector<HashAtom,DefaultEdge> connectivityInspector = new ConnectivityInspector<HashAtom,DefaultEdge>(testGraph);
+			List<Set<HashAtom>> atomSets = connectivityInspector.connectedSets();
 			log.info("Molecule broke into "+atomSets.size());
-			for (Set<Atom<List<Byte>>> atomSet : atomSets ) {
+			for (Set<HashAtom> atomSet : atomSets) {
 				log.info("Fragment has "+atomSet.size()+" atoms in it");
 				//create a new molecule from this set
-				UndirectedGraphBuilder<Atom<List<Byte>>,DefaultEdge,Molecule<List<Byte>>> builder = 
-						new UndirectedGraphBuilder<>(new Molecule<List<Byte>>());
+				UndirectedGraphBuilder<HashAtom,DefaultEdge,SimpleGraph<HashAtom,DefaultEdge>> builder = 
+						new UndirectedGraphBuilder<>(new SimpleGraph<HashAtom,DefaultEdge>(DefaultEdge.class));
 				
 				Set<DefaultEdge> edgeSet = new HashSet<>();
-				for (Atom<List<Byte>> atom : atomSet) {
+				for (HashAtom atom : atomSet) {
 					builder.addVertex(atom);
-					edgeSet.addAll(mol.edgesOf(atom));
+					edgeSet.addAll(testGraph.edgesOf(atom));
 				}
 				
 				log.info("Fragment has "+edgeSet.size()+" edges in it");
 				for (DefaultEdge edge : edgeSet) {
-					builder.addEdge(mol.getEdgeSource(edge), mol.getEdgeTarget(edge));
+					builder.addEdge(testGraph.getEdgeSource(edge), testGraph.getEdgeTarget(edge));
 				}
 				
-				Molecule<List<Byte>> newMol = builder.build();
-				log.info("New molecule has "+newMol.edgeSet().size()+" edges");
-				log.info("New molecule has "+newMol.vertexSet().size()+" atoms");
+				HashMolecule newMol = HashMolecule.createFrom(builder.build());
 				
 				if (newMol.equals(mol)) {
 					throw new IllegalArgumentException("no difference after broken");
 				}
 				
 				//recursively test stability of broken fragments
-				Multiset<Molecule<List<Byte>>> fragments = testStability(newMol);
+				Multiset<HashMolecule> fragments = testStability(newMol);
 				toReturn.addAll(fragments);			
 			}
 		}
 		log.info("Finished stability test - "+toReturn.size()+" fragments");
 		return toReturn;		
-	}
-	
-	private Set<DefaultEdge> getBreakingEdges(Molecule<List<Byte>> mol) {
-		if (!(new ConnectivityInspector(mol)).isGraphConnected()) {
-			throw new IllegalArgumentException("Must be a single connected component");
-		}
-		
-		Set<DefaultEdge> breakingEdges = new HashSet<>();
-		for (DefaultEdge e : new HashSet<>(mol.edgeSet())) {
-			Atom<List<Byte>> source = mol.getEdgeSource(e);
-			Atom<List<Byte>> target = mol.getEdgeTarget(e);
-			//test if this edge can break
-			//remove it
-			mol.removeEdge(e);
-			//evaluate
-			int diff = getHashDiff(getHash(mol, source), getHash(mol, target));
-			//log.debug("diff = "+diff);
-			if (diff < BREAKDIFF) {
-				breakingEdges.add(e);
-			}
-			//restore edge
-			mol.addEdge(source, target, e);
-		}
-		return breakingEdges;
-	}
-	
-	private Integer getHashDiff(List<Byte> hashA, List<Byte> hashB) {
-		//TODO check lengths
-		Integer total = 0;
-		for (Byte b : hashA) {
-			total += b;
-		}
-		for (Byte b : hashB) {
-			total -= b;
-		}
-		return Math.abs(total);
-	}
-	
-	private List<Byte> getHash(Graph<Atom<List<Byte>>,DefaultEdge> graph, Atom<List<Byte>> start) {
-		//if the hashing is order sensitive (md5) need this to iterate in a reliable and consistent manner 
-		//  this doesnt because it uses set and its hard to order arbitrary graph nodes
-		//so use a order independent (commutative) hashing algorithm (e.g. addition with overflow)
-		//  then we dont care about the ordering of nodes
-		//    but then the structure of the graph wont matter, only content
-		List<Byte> hash = new ArrayList<>();
-		hash.addAll(start.body);
-		Iterator<Atom<List<Byte>>> it = new DepthFirstIterator<Atom<List<Byte>>,DefaultEdge>(graph,start);
-		while(it.hasNext()) {
-			Atom<List<Byte>> next = it.next();
-			for (int i = 0; i < hash.size(); i++) {
-				hash.set(i, (byte) (hash.get(i)+next.body.get(i)));
-			}
-		}
-		return Collections.unmodifiableList(hash);
 	}
 }
