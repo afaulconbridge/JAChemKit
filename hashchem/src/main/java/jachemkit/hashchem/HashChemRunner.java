@@ -39,24 +39,12 @@ public class HashChemRunner implements CommandLineRunner {
 
 		Random rng = new Random(42);
 		
+		HashChemistry hashChemistry = new HashChemistry();
+		
 		//create a random molecule
 		
 		for (int i=0; i < 128; i++) {
-			Molecule<List<Byte>> mol = null;
-			while (mol == null) {
-				log.info("Generating molecule...");
-				mol = new Molecule<>();
-				GraphGenerator<Atom<List<Byte>>,DefaultEdge,?> gen = new RandomGraphGenerator<>(16,24, rng.nextLong());
-				try {
-					gen.generateGraph(mol, ()-> new Atom<>(getRandomByteList(rng)), null);
-					if (!(new ConnectivityInspector(mol)).isGraphConnected()) {
-						throw new IllegalArgumentException("Must be a single connected component");
-					}
-				} catch (IllegalArgumentException e) {
-					//thrown either if try to randomly create self-edges (loops) or multiple components
-					mol = null;
-				}
-			}
+			Molecule<List<Byte>> mol = hashChemistry.createRandomMolecule(rng);
 			//test if it is stable
 			//getBreakingEdges(mol);
 			testStability(mol);
@@ -90,16 +78,6 @@ public class HashChemRunner implements CommandLineRunner {
 			}
 		}
 		*/
-	}
-	
-	private List<Byte> getRandomByteList(Random rng) {
-		byte[] hash = new byte[8];
-		rng.nextBytes(hash);
-		List<Byte> listHash = new ArrayList<>(hash.length);
-		for (int i = 0; i < hash.length; i++) {
-			listHash.add(new Byte(hash[i]));
-		}
-		return Collections.unmodifiableList(listHash);
 	}
 	
 	private Multiset<Molecule<List<Byte>>> testStability(Molecule<List<Byte>> mol) {

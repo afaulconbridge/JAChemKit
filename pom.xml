@@ -11,7 +11,8 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.3.3.RELEASE</version>
+		<!-- <version>1.3.3.RELEASE</version> -->
+		<version>1.4.0.M2</version>
 	</parent>
 
 	<properties>
@@ -22,6 +23,7 @@
 	<modules>
 		<module>core</module>
 		<module>hashchem</module>
+		<module>webapp</module>
 	</modules>
 
 	<dependencyManagement>
@@ -32,10 +34,22 @@
 				<version>${jachemkit.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>jachemkit</groupId>
+				<artifactId>hashchem</artifactId>
+				<version>${jachemkit.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jachemkit</groupId>
+				<artifactId>webapp</artifactId>
+				<version>${jachemkit.version}</version>
+			</dependency>
+
+			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
 				<version>19.0</version>
 			</dependency>
+
 			<dependency>
 				<groupId>org.jgrapht</groupId>
 				<artifactId>jgrapht-core</artifactId>
@@ -44,12 +58,29 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+	<!-- Add Spring repositories -->
+	<!-- (you don't need this if you are using a .RELEASE version) -->
+	<repositories>
+		<repository>
+			<id>spring-snapshots</id>
+			<url>http://repo.spring.io/snapshot</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>spring-milestones</id>
+			<url>http://repo.spring.io/milestone</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>spring-snapshots</id>
+			<url>http://repo.spring.io/snapshot</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>spring-milestones</id>
+			<url>http://repo.spring.io/milestone</url>
+		</pluginRepository>
+	</pluginRepositories>
 </project>
