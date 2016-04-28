@@ -1,22 +1,14 @@
 package jachemkit.hashchem;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.jgrapht.Graph;
 import org.jgrapht.alg.ConnectivityInspector;
-import org.jgrapht.generate.GraphGenerator;
-import org.jgrapht.generate.RandomGraphGenerator;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 import org.jgrapht.graph.builder.UndirectedGraphBuilder;
-import org.jgrapht.graph.builder.UndirectedGraphBuilderBase;
-import org.jgrapht.traverse.DepthFirstIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -90,12 +82,12 @@ public class HashChemRunner implements CommandLineRunner {
 			//something broke
 			//create a simple graph so we can modify it
 			SimpleGraph<HashAtom,DefaultEdge> testGraph = new SimpleGraph<HashAtom,DefaultEdge>(DefaultEdge.class);
-			for (HashAtom atom : mol.structure.vertexSet()) {
+			for (HashAtom atom : mol.getStructure().vertexSet()) {
 				testGraph.addVertex(atom);
 			}
-			for (DefaultEdge e : mol.structure.edgeSet()) {
-				HashAtom sourceAtom = mol.structure.getEdgeSource(e);
-				HashAtom targetAtom = mol.structure.getEdgeTarget(e);
+			for (DefaultEdge e : mol.getStructure().edgeSet()) {
+				HashAtom sourceAtom = mol.getStructure().getEdgeSource(e);
+				HashAtom targetAtom = mol.getStructure().getEdgeTarget(e);
 				testGraph.addEdge(sourceAtom, targetAtom, e);
 			}
 			

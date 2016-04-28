@@ -9,13 +9,17 @@
 	</parent>
 
 	<artifactId>core</artifactId>
-	
+
 	<packaging>jar</packaging>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-guava</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.jgrapht</groupId>

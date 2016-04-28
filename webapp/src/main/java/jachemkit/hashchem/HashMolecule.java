@@ -14,17 +14,27 @@ import org.jgrapht.graph.SimpleGraph;
 import org.jgrapht.graph.UnmodifiableUndirectedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 public class HashMolecule {
 	
 	private static final int BREAKDIFF = 64;
 	
-	protected UnmodifiableUndirectedGraph<HashAtom, DefaultEdge> structure;
-	
+	@JsonSerialize(using = UnmodifiableUndirectedGraphSerializer.class)
+	@JsonDeserialize(using = HashMoleculeStructureDeserializer.class)
+	private UnmodifiableUndirectedGraph<HashAtom, DefaultEdge> structure;
 	
 	private HashMolecule(){
 		
 	}
 	
+	public UnmodifiableUndirectedGraph<HashAtom, DefaultEdge> getStructure() {
+		return structure;
+	}
+	
+	@JsonIgnore
 	public Set<DefaultEdge> getBreakingEdges() {
 		if (!(new ConnectivityInspector<HashAtom, DefaultEdge>(this.structure)).isGraphConnected()) {
 			throw new IllegalArgumentException("Must be a single connected component");
