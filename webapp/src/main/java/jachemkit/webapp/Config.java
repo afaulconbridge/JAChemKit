@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 
-import jachemkit.hashchem.HashChemistry;
+import jachemkit.hashchem.model.HashChemistry;
 
 @EnableNeo4jRepositories(basePackages = "jachemkit")
 @EnableTransactionManagement
@@ -32,7 +32,7 @@ public class Config extends Neo4jConfiguration {
 	}
 	
 	@Bean
-	public Module customModule() {
+	public Module getGuavaModule() {
 	  return new GuavaModule();
 	}
 

@@ -1,4 +1,4 @@
-package jachemkit.hashchem;
+package jachemkit.hashchem.model;
 
 import java.util.List;
 

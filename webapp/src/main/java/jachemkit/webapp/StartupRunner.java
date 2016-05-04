@@ -10,8 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 
-import jachemkit.hashchem.HashChemistry;
-import jachemkit.hashchem.HashMolecule;
+import jachemkit.hashchem.model.HashChemistry;
+import jachemkit.hashchem.model.HashMolecule;
 
 @Component
 public class StartupRunner implements CommandLineRunner  {
@@ -23,21 +23,7 @@ public class StartupRunner implements CommandLineRunner  {
 	
 	@Override
 	public void run(String... args) throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-		mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-		mapper.registerModule(new GuavaModule());
-
 		
-		HashMolecule mol = hashChemistry.createRandomMolecule();
-		String json = mapper.writeValueAsString(mol); 
-		log.info(json);
-		
-		HashMolecule mol2 = mapper.readValue(json, HashMolecule.class);
-		String json2 = mapper.writeValueAsString(mol2); 
-
-		log.info(json2);
-		log.info("Equal? "+json.equals(json2));
 	}
 
 }

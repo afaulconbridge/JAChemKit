@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
+import jachemkit.hashchem.model.HashAtom;
+
 public class HashMoleculeStructureDeserializer  extends StdDeserializer<UnmodifiableUndirectedGraph<HashAtom,DefaultEdge>> {
 
 	protected HashMoleculeStructureDeserializer() {
