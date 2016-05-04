@@ -23,11 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jachemkit.hashchem.HashMoleculeStructureDeserializer;
 import jachemkit.hashchem.UnmodifiableUndirectedGraphSerializer;
 
-@NodeEntity
 public class HashMolecule {
-
-	@GraphId
-	private Long id;
 	
 	@JsonSerialize(using = UnmodifiableUndirectedGraphSerializer.class)
 	@JsonDeserialize(using = HashMoleculeStructureDeserializer.class)

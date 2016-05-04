@@ -14,9 +14,9 @@ import com.fasterxml.jackson.datatype.guava.GuavaModule;
 
 import jachemkit.hashchem.model.HashChemistry;
 
-@EnableNeo4jRepositories(basePackages = "jachemkit")
-@EnableTransactionManagement
 @SpringBootApplication
+@EnableTransactionManagement
+@EnableNeo4jRepositories(basePackages = "jachemkit")
 public class Config extends Neo4jConfiguration {
 
 	@Bean
