@@ -1,7 +1,11 @@
 package jachemkit.webapp;
 
+import java.util.Comparator;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.jgrapht.alg.isomorphism.VF2GraphIsomorphismInspector;
+import org.jgrapht.graph.DefaultEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +15,9 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
+import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.HashMultiset;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
 
 import jachemkit.hashchem.model.HashChemistry;
@@ -34,42 +40,57 @@ public class StartupRunner implements CommandLineRunner  {
 	@Override
 	public void run(String... args) throws Exception {
 		//create a molecule
-		NeoAtom a1 = new NeoAtom();
+		NeoAtom a1 = new NeoAtom(ImmutableList.of(1,2,3,4,5,6,7,8));
+		
 		NeoMolecule mol = new NeoMolecule(a1);
 		
-		mol.addAtom(new NeoAtom(), a1);
-		mol.addAtom(new NeoAtom(), a1);
+		mol.addAtom(new NeoAtom (ImmutableList.of(2,2,3,4,5,6,7,8)), a1);
+		mol.addAtom(new NeoAtom (ImmutableList.of(3,2,3,4,5,6,7,8)), a1);
 
-		NeoAtom a4 = new NeoAtom();
+		NeoAtom  a4 = new NeoAtom(ImmutableList.of(4,2,3,4,5,6,7,8));
 		mol.addAtom(a4, a1);
-		mol.addAtom(new NeoAtom(), a4);
+		mol.addAtom(new NeoAtom (ImmutableList.of(5,2,3,4,5,6,7,8)), a4);
 		
-		//persist it
-		
+		//persist it		
 		mol = moleculeRepository.save(mol);
 		
-		//restore it
-		
+		//restore it		
 		NeoMolecule mol2 = moleculeRepository.findAll().iterator().next();
 		
-		//compare it
-	
-		if (mol2.getAtoms().size() != mol.getAtoms().size()) {
-			throw new RuntimeException("Size difference! "+mol.getAtoms().size()+" vs "+mol2.getAtoms().size());
-		}
-		
-		Multiset<Integer> molMultiset = HashMultiset.create();
-		mol.getAtoms().stream().mapToInt((a)->a.getBondedTo().size()).boxed().forEach((i)->molMultiset.add(i));
-		Multiset<Integer> mol2Multiset = HashMultiset.create();
-		mol2.getAtoms().stream().mapToInt((a)->a.getBondedTo().size()).boxed().forEach((i)->mol2Multiset.add(i));
-		
-		if (!molMultiset.equals(mol2Multiset)) {
-
-			throw new RuntimeException("Connectivity difference!");
+		//compare it		
+		Comparator<DefaultEdge> edgeComparator = new Comparator<DefaultEdge>(){
+			@Override
+			public int compare(DefaultEdge e1, DefaultEdge e2) {
+				return 0;
+			}			
+		};
+		Comparator<NeoAtom> vertexComparator = new Comparator<NeoAtom>(){
+			@Override
+			public int compare(NeoAtom a1, NeoAtom a2) {
+				if (a1.getValue().size() < a2.getValue().size()) {
+					return -1;
+				} else if (a1.getValue().size() > a2.getValue().size()) {
+					return 1;
+				} else  {
+					for (int i=0; i < a1.getValue().size(); i++) {
+						Integer v1 = a1.getValue().get(i);
+						Integer v2 = a2.getValue().get(i);
+						if (v1.compareTo(v2) != 0) {
+							return v1.compareTo(v2);
+						}
+					}
+					return 0;
+				}
+			}			
+		};
+		VF2GraphIsomorphismInspector<NeoAtom, DefaultEdge> inspector = 
+				new VF2GraphIsomorphismInspector<>(mol.getStructure(), mol2.getStructure(),
+						vertexComparator, edgeComparator);
 			
+		if (!inspector.isomorphismExists()) {
+			throw new RuntimeException("Unable to find isomorphism");
 		}
 		
-		//TODO finish
 		
 	}
 
