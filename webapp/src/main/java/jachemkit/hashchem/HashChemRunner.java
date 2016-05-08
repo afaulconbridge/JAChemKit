@@ -19,7 +19,7 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
 import jachemkit.hashchem.model.HashChemistry;
-import jachemkit.hashchem.model.HashMolecule;
+import jachemkit.hashchem.neo.NeoMolecule;
 
 @Component
 public class HashChemRunner implements CommandLineRunner {
@@ -37,7 +37,7 @@ public class HashChemRunner implements CommandLineRunner {
 		
 		//create a random molecule		
 		for (int i=0; i < 128; i++) {
-			HashMolecule mol = hashChemistry.createRandomMolecule(rng);
+			NeoMolecule mol = hashChemistry.createRandomMolecule(rng);
 			//test if it is stable
 			//getBreakingEdges(mol);
 			hashChemistry.getDecompositionProducts(mol);

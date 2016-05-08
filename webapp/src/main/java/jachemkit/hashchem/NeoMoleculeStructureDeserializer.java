@@ -16,31 +16,31 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
-import jachemkit.hashchem.model.HashAtom;
+import jachemkit.hashchem.neo.NeoAtom;
 
-public class HashMoleculeStructureDeserializer  extends StdDeserializer<UnmodifiableUndirectedGraph<HashAtom,DefaultEdge>> {
+public class NeoMoleculeStructureDeserializer  extends StdDeserializer<UnmodifiableUndirectedGraph<NeoAtom,DefaultEdge>> {
 
-	protected HashMoleculeStructureDeserializer() {
+	protected NeoMoleculeStructureDeserializer() {
 		super(UnmodifiableUndirectedGraph.class);
 	}
 
 	@Override
-	public UnmodifiableUndirectedGraph<HashAtom,DefaultEdge> deserialize(JsonParser p, DeserializationContext ctxt)
+	public UnmodifiableUndirectedGraph<NeoAtom,DefaultEdge> deserialize(JsonParser p, DeserializationContext ctxt)
 			throws IOException, JsonProcessingException {
 		//setup a json parser
 		ObjectCodec objectCodec = p.getCodec();
 		JsonNode root = objectCodec.readTree(p);
 
 		//create the wrapped graph
-		SimpleGraph<HashAtom,DefaultEdge> simpleGraph = new SimpleGraph<>(DefaultEdge.class);
+		SimpleGraph<NeoAtom,DefaultEdge> simpleGraph = new SimpleGraph<>(DefaultEdge.class);
 
 		//need a list of vertexs to resolve the reference based edges
-		List<HashAtom> vertexs = new ArrayList<>();
+		List<NeoAtom> vertexs = new ArrayList<>();
 		
 		//add all the vertexs to both the graph and temp list
 		JsonNode jsonVertexs = root.findValue("verticies");
 		for (JsonNode jsonVertex : (Iterable<JsonNode>) () -> jsonVertexs.elements()) {
-			HashAtom vertex = objectCodec.treeToValue(jsonVertex, HashAtom.class);
+			NeoAtom vertex = objectCodec.treeToValue(jsonVertex, NeoAtom.class);
 			vertexs.add(vertex);
 			simpleGraph.addVertex(vertex);
 		}
@@ -54,8 +54,8 @@ public class HashMoleculeStructureDeserializer  extends StdDeserializer<Unmodifi
 			//now we can generate the pair of vertex ids
 			List<Integer> edgeList = edgeParser.readValueAs(new TypeReference<List<Integer>>(){});
 			//turn that into an edge on the graph we are building
-			HashAtom sourceVertex = vertexs.get(edgeList.get(0));
-			HashAtom targetVertex = vertexs.get(edgeList.get(1));
+			NeoAtom sourceVertex = vertexs.get(edgeList.get(0));
+			NeoAtom targetVertex = vertexs.get(edgeList.get(1));
 			simpleGraph.addEdge(sourceVertex, targetVertex);			
 		}
 		

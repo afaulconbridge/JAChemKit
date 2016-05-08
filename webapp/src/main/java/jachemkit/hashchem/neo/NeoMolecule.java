@@ -1,7 +1,9 @@
 package jachemkit.hashchem.neo;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.jgrapht.graph.DefaultEdge;
@@ -12,9 +14,6 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import com.google.common.collect.ImmutableSet;
-
-import jachemkit.hashchem.model.HashAtom;
-import jachemkit.hashchem.model.HashMolecule;
 
 @NodeEntity
 public class NeoMolecule {
@@ -76,5 +75,39 @@ public class NeoMolecule {
 			structure = new UnmodifiableUndirectedGraph<>(newStructure);
 		} 
 		return structure;
+	}
+
+	public static NeoMolecule createFrom(SimpleGraph<NeoAtom, DefaultEdge> structure) {
+		//create a new graph
+		SimpleGraph<NeoAtom,DefaultEdge> newStructure = new SimpleGraph<>(DefaultEdge.class);
+		
+		//copy each atom
+		Map<NeoAtom,NeoAtom> atomInstance = new HashMap<>();
+		for (NeoAtom oldAtom : structure.vertexSet()) {
+			NeoAtom newAtom = new NeoAtom(oldAtom.getValue());
+			atomInstance.put(oldAtom, newAtom);
+		}
+		//set the bonds of each atom
+		for (NeoAtom oldAtom : structure.vertexSet()) {
+			NeoAtom newAtom = atomInstance.get(oldAtom);
+			for (DefaultEdge e : structure.edgesOf(newAtom)) {
+				NeoAtom source = structure.getEdgeSource(e);
+				NeoAtom target = structure.getEdgeTarget(e);
+				//compare by id
+				if (source == oldAtom) {
+					newAtom.addBondTo(atomInstance.get(target));
+				}
+				if (target == oldAtom) {
+					newAtom.addBondTo(atomInstance.get(source));
+				}
+			}
+		}
+		
+		
+		//create a molecule from those atoms
+		NeoMolecule mol = new NeoMolecule();
+		mol.atoms = new HashSet<>(atomInstance.values());
+		
+		return mol;
 	}
 }
