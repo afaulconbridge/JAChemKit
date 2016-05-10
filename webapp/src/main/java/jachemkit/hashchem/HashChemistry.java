@@ -1,4 +1,4 @@
-package jachemkit.hashchem.model;
+package jachemkit.hashchem;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,6 +18,7 @@ import org.jgrapht.graph.builder.UndirectedGraphBuilder;
 import org.jgrapht.traverse.DepthFirstIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
@@ -27,6 +28,7 @@ import jachemkit.core.ArtificialChemistry;
 import jachemkit.hashchem.neo.NeoAtom;
 import jachemkit.hashchem.neo.NeoMolecule;
 
+@Component
 public class HashChemistry implements ArtificialChemistry<NeoMolecule> {
 	
 	private Logger log = LoggerFactory.getLogger(this.getClass());

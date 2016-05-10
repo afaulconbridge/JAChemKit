@@ -1,4 +1,4 @@
-package jachemkit.webapp;
+package jachemkit.hashchem;
 
 import org.neo4j.ogm.config.Configuration;
 import org.neo4j.ogm.session.SessionFactory;
@@ -12,16 +12,14 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 
-import jachemkit.hashchem.model.HashChemistry;
-
 @SpringBootApplication
 @EnableTransactionManagement
-@EnableNeo4jRepositories(basePackages = "jachemkit")
+@EnableNeo4jRepositories(basePackages = "jachemkit.hashchem.neo")
 public class Config extends Neo4jConfiguration {
 
 	@Bean
 	public SessionFactory getSessionFactory() {
-		return new SessionFactory(getConfiguration(),"jachemkit");
+		return new SessionFactory(getConfiguration(),"jachemkit.hashchem.neo");
 	}
 
 	@Bean
@@ -34,11 +32,6 @@ public class Config extends Neo4jConfiguration {
 	@Bean
 	public Module getGuavaModule() {
 	  return new GuavaModule();
-	}
-
-	@Bean
-	public HashChemistry hashChemistry() {
-		return new HashChemistry();
 	}
 
 	public static void main(String[] args) {
