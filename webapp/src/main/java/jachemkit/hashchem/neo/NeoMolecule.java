@@ -1,11 +1,13 @@
 package jachemkit.hashchem.neo;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.jgrapht.alg.isomorphism.VF2GraphIsomorphismInspector;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 import org.jgrapht.graph.UnmodifiableUndirectedGraph;
@@ -17,7 +19,6 @@ import com.google.common.collect.ImmutableSet;
 
 @NodeEntity
 public class NeoMolecule {
-
 
 	@GraphId
 	private Long id;
@@ -35,6 +36,10 @@ public class NeoMolecule {
 		atoms = new HashSet<>();
 		atom.setMolecule(this);
 		atoms.add(atom);
+	}
+	
+	public Long getNeoId() {
+		return id;
 	}
 	
 	public ImmutableSet<NeoAtom> getAtoms() {
@@ -109,5 +114,50 @@ public class NeoMolecule {
 		mol.atoms = new HashSet<>(atomInstance.values());
 		
 		return mol;
+	}
+
+	
+	private class DefaultEdgeComparator implements Comparator<DefaultEdge> {
+		@Override
+		public int compare(DefaultEdge e1, DefaultEdge e2) {
+			return 0;
+		}			
+	}
+	private class NeoAtomComparator implements Comparator<NeoAtom> {
+		@Override
+		public int compare(NeoAtom a1, NeoAtom a2) {
+			if (a1.getValue().size() < a2.getValue().size()) {
+				return -1;
+			} else if (a1.getValue().size() > a2.getValue().size()) {
+				return 1;
+			} else  {
+				for (int i=0; i < a1.getValue().size(); i++) {
+					Integer v1 = a1.getValue().get(i);
+					Integer v2 = a2.getValue().get(i);
+					if (v1.compareTo(v2) != 0) {
+						return v1.compareTo(v2);
+					}
+				}
+				return 0;
+			}
+		}			
+	}
+	
+	public boolean equals(NeoMolecule other) {
+		if (other == null) {
+			return false;
+		}
+		if (other == this) {
+			return true;
+		}
+		if (this.getNeoId() != null && other.getNeoId() != null 
+				&& this.getNeoId().equals(other.getNeoId())) {
+			return true;
+		}
+		//have to do graph isomorphism, might be slow!
+		VF2GraphIsomorphismInspector<NeoAtom, DefaultEdge> inspector = 
+				new VF2GraphIsomorphismInspector<>(this.getStructure(), other.getStructure(),
+						new NeoAtomComparator(), new DefaultEdgeComparator());
+		return inspector.isomorphismExists();
 	}
 }

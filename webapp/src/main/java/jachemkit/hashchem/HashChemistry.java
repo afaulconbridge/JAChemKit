@@ -36,7 +36,7 @@ public class HashChemistry implements ArtificialChemistry<NeoMolecule> {
 	private static final int BREAKDIFF = 64;
 
 	
-	private ImmutableList<Integer> getRandomByteList(Random rng) {
+	private ImmutableList<Integer> getRandomIntegerList(Random rng) {
 		byte[] hash = new byte[8];
 		rng.nextBytes(hash);
 		List<Integer> listHash = new ArrayList<>(hash.length);
@@ -57,13 +57,14 @@ public class HashChemistry implements ArtificialChemistry<NeoMolecule> {
 					
 			GraphGenerator<NeoAtom,DefaultEdge,?> gen = new RandomGraphGenerator<>(noAtoms,noEdges, rng.nextLong());
 			try {
-				gen.generateGraph(structure, ()-> new NeoAtom(getRandomByteList(rng)), null);
+				gen.generateGraph(structure, ()-> new NeoAtom(getRandomIntegerList(rng)), null);
 				if (!(new ConnectivityInspector<NeoAtom,DefaultEdge>(structure)).isGraphConnected()) {
 					throw new IllegalArgumentException("Must be a single connected component");
 				}
 				mol = NeoMolecule.createFrom(structure);
 			} catch (IllegalArgumentException e) {
 				//thrown either if try to randomly create self-edges (loops) or multiple components
+				log.warn("Retrying creating random molecule");
 				mol = null;
 			}
 		}

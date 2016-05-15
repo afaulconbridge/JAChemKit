@@ -19,16 +19,9 @@ public class Config extends Neo4jConfiguration {
 
 	@Bean
 	public SessionFactory getSessionFactory() {
-		return new SessionFactory(getConfiguration(),"jachemkit.hashchem.neo");
+		return new SessionFactory("jachemkit.hashchem.neo");
 	}
 
-	@Bean
-	public Configuration getConfiguration() {
-		Configuration config = new Configuration();
-		config.driverConfiguration().setDriverClassName("org.neo4j.ogm.drivers.embedded.driver.EmbeddedDriver");
-		return config;
-	}
-	
 	@Bean
 	public Module getGuavaModule() {
 	  return new GuavaModule();
