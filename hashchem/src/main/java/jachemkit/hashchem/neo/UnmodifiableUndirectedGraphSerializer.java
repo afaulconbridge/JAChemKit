@@ -1,4 +1,4 @@
-package jachemkit.hashchem;
+package jachemkit.hashchem.neo;
 
 import java.io.IOException;
 import java.util.ArrayList;

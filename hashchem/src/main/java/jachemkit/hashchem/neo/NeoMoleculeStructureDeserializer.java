@@ -1,4 +1,4 @@
-package jachemkit.hashchem;
+package jachemkit.hashchem.neo;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,8 +15,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-
-import jachemkit.hashchem.neo.NeoAtom;
 
 public class NeoMoleculeStructureDeserializer  extends StdDeserializer<UnmodifiableUndirectedGraph<NeoAtom,DefaultEdge>> {
 
