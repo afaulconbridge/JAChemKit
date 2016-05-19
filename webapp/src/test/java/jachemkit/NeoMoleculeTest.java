@@ -9,12 +9,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.google.common.collect.ImmutableList;
 
-import jachemkit.hashchem.Config;
 import jachemkit.hashchem.neo.NeoAtom;
 import jachemkit.hashchem.neo.NeoMolecule;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes=Config.class)
 public class NeoMoleculeTest {
 	
 	private Logger log = LoggerFactory.getLogger(this.getClass());

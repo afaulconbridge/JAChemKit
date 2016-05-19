@@ -22,7 +22,6 @@
 
 	<modules>
 		<module>core</module>
-		<module>hashchem</module>
 		<module>webapp</module>
 	</modules>
 

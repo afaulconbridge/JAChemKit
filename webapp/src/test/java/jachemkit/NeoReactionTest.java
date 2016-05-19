@@ -13,13 +13,11 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
 
-import jachemkit.hashchem.Config;
 import jachemkit.hashchem.neo.NeoAtom;
 import jachemkit.hashchem.neo.NeoMolecule;
 import jachemkit.hashchem.neo.NeoReaction;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes=Config.class)
 public class NeoReactionTest {
 	
 	private Logger log = LoggerFactory.getLogger(this.getClass());

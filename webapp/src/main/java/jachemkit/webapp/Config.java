@@ -1,8 +1,9 @@
-package jachemkit.hashchem;
+package jachemkit.webapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.neo4j.NodeEntityScan;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -14,7 +15,7 @@ import com.fasterxml.jackson.datatype.guava.GuavaModule;
 @EnableTransactionManagement
 @EnableNeo4jRepositories("jachemkit.hashchem.neo")
 @NodeEntityScan("jachemkit.hashchem.neo")
-public class Config  {
+public class Config extends SpringBootServletInitializer {
 
 	@Bean
 	public Module getGuavaModule() {
@@ -22,6 +23,6 @@ public class Config  {
 	}
 
 	public static void main(String[] args) {
-		System.exit(SpringApplication.exit(SpringApplication.run(Config.class, args)));
+		SpringApplication.run(Config.class, args);
 	}
 }
