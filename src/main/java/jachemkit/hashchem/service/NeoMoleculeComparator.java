@@ -4,6 +4,7 @@ import java.util.Comparator;
 
 import org.jgrapht.alg.isomorphism.VF2GraphIsomorphismInspector;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.UnmodifiableUndirectedGraph;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,10 @@ public class NeoMoleculeComparator implements Comparator<NeoMolecule> {
 	private static class NeoAtomComparator implements Comparator<NeoAtom> {
 		@Override
 		public int compare(NeoAtom a1, NeoAtom a2) {
+			return a1.getValue().compareTo(a2.getValue());
+			
+/*
+ * legacy from list of integers value
 			if (a1.getValue().size() < a2.getValue().size()) {
 				return -1;
 			} else if (a1.getValue().size() > a2.getValue().size()) {
@@ -38,7 +43,8 @@ public class NeoMoleculeComparator implements Comparator<NeoMolecule> {
 					}
 				}
 				return 0;
-			}
+			}								
+ */
 		}			
 	}
 
@@ -57,9 +63,11 @@ public class NeoMoleculeComparator implements Comparator<NeoMolecule> {
 				&& m1.getNeoId().equals(m2.getNeoId())) {
 			return 0;
 		}
+		UnmodifiableUndirectedGraph<NeoAtom, DefaultEdge> s1 = structureService.getStructure(m1);
+		UnmodifiableUndirectedGraph<NeoAtom, DefaultEdge> s2 = structureService.getStructure(m2);
 		//have to do graph isomorphism, might be slow!
 		VF2GraphIsomorphismInspector<NeoAtom, DefaultEdge> inspector = 
-				new VF2GraphIsomorphismInspector<>(structureService.getStructure(m1), structureService.getStructure(m2),
+				new VF2GraphIsomorphismInspector<>(s1, s2,
 						new NeoAtomComparator(), new DefaultEdgeComparator());
 		if (inspector.isomorphismExists()) {
 			return 0;

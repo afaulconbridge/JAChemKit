@@ -18,6 +18,7 @@ public class NeoMoleculeTest {
 
 	@Test
 	public void testPersistance() {
+		/*
 
 		//create a molecule
 		NeoAtom a1 = new NeoAtom(ImmutableList.of(1,2,3,4,5,6,7,8));
@@ -31,7 +32,6 @@ public class NeoMoleculeTest {
 		mol.addAtom(a4, a1);
 		mol.addAtom(new NeoAtom (ImmutableList.of(5,2,3,4,5,6,7,8)), a4);
 		
-/*
 		log.info("Saved molecule with id "+mol.getNeoId());
 		
 		//compare it		
