@@ -5,8 +5,6 @@ import org.jgrapht.graph.SimpleGraph;
 import org.jgrapht.graph.UnmodifiableUndirectedGraph;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jachemkit.hashchem.model.NeoAtom;
 import jachemkit.hashchem.model.NeoMolecule;
 

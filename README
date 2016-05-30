@@ -2,3 +2,5 @@ JAChemKit
 ---------
 
 A Java toolkit for artificial chemistries. This is arranged as a Maven project with submodules for different libraries and chemistries.
+
+Note: this uses Neo4J, which is avaliable under both GPLv3 and AGPLv3

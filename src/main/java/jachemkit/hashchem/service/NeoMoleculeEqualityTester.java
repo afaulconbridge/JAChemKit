@@ -12,7 +12,7 @@ import jachemkit.hashchem.model.NeoAtom;
 import jachemkit.hashchem.model.NeoMolecule;
 
 @Service
-public class NeoMoleculeComparator implements Comparator<NeoMolecule> {
+public class NeoMoleculeEqualityTester {
 
 	@Autowired
 	private StructureService structureService;
@@ -48,8 +48,7 @@ public class NeoMoleculeComparator implements Comparator<NeoMolecule> {
 		}			
 	}
 
-	@Override
-	public int compare(NeoMolecule m1, NeoMolecule m2) {
+	public boolean areEqual(NeoMolecule m1, NeoMolecule m2) {
 		if (m1 == null) {
 			throw new IllegalArgumentException("Cannot comapre to null");
 		}
@@ -57,11 +56,11 @@ public class NeoMoleculeComparator implements Comparator<NeoMolecule> {
 			throw new IllegalArgumentException("Cannot comapre to null");
 		}
 		if (m2 == m1) {
-			return 0;
+			return true;
 		}
 		if (m1.getNeoId() != null && m2.getNeoId() != null 
 				&& m1.getNeoId().equals(m2.getNeoId())) {
-			return 0;
+			return true;
 		}
 		UnmodifiableUndirectedGraph<NeoAtom, DefaultEdge> s1 = structureService.getStructure(m1);
 		UnmodifiableUndirectedGraph<NeoAtom, DefaultEdge> s2 = structureService.getStructure(m2);
@@ -70,10 +69,10 @@ public class NeoMoleculeComparator implements Comparator<NeoMolecule> {
 				new VF2GraphIsomorphismInspector<>(s1, s2,
 						new NeoAtomComparator(), new DefaultEdgeComparator());
 		if (inspector.isomorphismExists()) {
-			return 0;
+			return true;
 		} else {
-			//they are different, need to order them somehow?
-			return 1;
+			//they are different, need to order them somehow for a comparator
+			return false;
 		}
 	}
 }
