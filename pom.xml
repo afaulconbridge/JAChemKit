@@ -2,11 +2,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>jachemkit</groupId>
-	<artifactId>jachemkit</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 
-	<packaging>pom</packaging>
+	<groupId>jachemkit</groupId>
+	<artifactId>webapp</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -17,45 +16,48 @@
 
 	<properties>
 		<java.version>1.8</java.version>
-		<jachemkit.version>0.0.1-SNAPSHOT</jachemkit.version>
 	</properties>
 
-	<modules>
-		<module>core</module>
-		<module>webapp</module>
-	</modules>
+	<packaging>war</packaging>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>jachemkit</groupId>
-				<artifactId>core</artifactId>
-				<version>${jachemkit.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>jachemkit</groupId>
-				<artifactId>hashchem</artifactId>
-				<version>${jachemkit.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>jachemkit</groupId>
-				<artifactId>webapp</artifactId>
-				<version>${jachemkit.version}</version>
-			</dependency>
+	<dependencies>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>19.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jgrapht</groupId>
+			<artifactId>jgrapht-core</artifactId>
+			<version>0.9.2</version>
+		</dependency>
 
-			<dependency>
-				<groupId>com.google.guava</groupId>
-				<artifactId>guava</artifactId>
-				<version>19.0</version>
-			</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
 
-			<dependency>
-				<groupId>org.jgrapht</groupId>
-				<artifactId>jgrapht-core</artifactId>
-				<version>0.9.2</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-neo4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-rest</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 
 	<!-- Add Spring repositories -->
 	<!-- (you don't need this if you are using a .RELEASE version) -->
@@ -82,4 +84,20 @@
 			<url>http://repo.spring.io/milestone</url>
 		</pluginRepository>
 	</pluginRepositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
