@@ -12,7 +12,7 @@ import jachemkit.hashchem.model.NeoAtom;
 import jachemkit.hashchem.model.NeoMolecule;
 
 @Service
-public class NeoMoleculeEqualityTester {
+public class MoleculeEqualityService {
 
 	@Autowired
 	private StructureService structureService;

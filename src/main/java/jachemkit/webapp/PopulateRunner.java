@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jachemkit.hashchem.model.NeoAtom;
 import jachemkit.hashchem.model.NeoMolecule;
 import jachemkit.hashchem.repo.MoleculeRepository;
-import jachemkit.hashchem.service.NeoMoleculeEqualityTester;
+import jachemkit.hashchem.service.MoleculeEqualityService;
 
 @Component
 public class PopulateRunner implements ApplicationRunner {
@@ -30,7 +30,7 @@ public class PopulateRunner implements ApplicationRunner {
 	private MoleculeRepository moleculeRepository;
 	
 	@Autowired
-	private NeoMoleculeEqualityTester moleculeEqualityTester;
+	private MoleculeEqualityService moleculeEqualityTester;
 	
 	@Autowired 
 	private ObjectMapper objectMapper;

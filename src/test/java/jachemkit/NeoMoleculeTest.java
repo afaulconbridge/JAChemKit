@@ -12,7 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jachemkit.hashchem.model.NeoAtom;
 import jachemkit.hashchem.model.NeoMolecule;
-import jachemkit.hashchem.service.NeoMoleculeEqualityTester;
+import jachemkit.hashchem.service.MoleculeEqualityService;
 
 @RunWith(SpringRunner.class)
 public class NeoMoleculeTest {
@@ -20,7 +20,7 @@ public class NeoMoleculeTest {
 	private Logger log = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
-	private NeoMoleculeEqualityTester moleculeEqualityTester;
+	private MoleculeEqualityService moleculeEqualityTester;
 	
 	@Autowired 
 	private ObjectMapper objectMapper;

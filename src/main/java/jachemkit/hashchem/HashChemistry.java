@@ -1,5 +1,6 @@
 package jachemkit.hashchem;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -22,6 +23,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
@@ -38,6 +42,9 @@ public class HashChemistry implements ArtificialChemistry<NeoMolecule> {
 
 	@Autowired
 	private StructureService structureService;
+	
+	@Autowired
+	private ObjectMapper objectMapper;
 	
 	private static final int BREAKDIFF = 64;
 
@@ -62,8 +69,15 @@ public class HashChemistry implements ArtificialChemistry<NeoMolecule> {
 			SimpleGraph<NeoAtom,DefaultEdge> structure = new SimpleGraph<NeoAtom,DefaultEdge>(DefaultEdge.class);
 					
 			GraphGenerator<NeoAtom,DefaultEdge,?> gen = new RandomGraphGenerator<>(noAtoms,noEdges, rng.nextLong());
+			String value;
 			try {
-				gen.generateGraph(structure, ()-> new NeoAtom(getRandomIntegerList(rng)), null);
+				value = objectMapper.writeValueAsString(getRandomIntegerList(rng));
+			} catch (JsonProcessingException e1) {
+				throw new RuntimeException(e1);
+			}
+			
+			try {
+				gen.generateGraph(structure, ()-> new NeoAtom(value), null);
 				if (!(new ConnectivityInspector<NeoAtom,DefaultEdge>(structure)).isGraphConnected()) {
 					throw new IllegalArgumentException("Must be a single connected component");
 				}
@@ -97,13 +111,24 @@ public class HashChemistry implements ArtificialChemistry<NeoMolecule> {
 		//  then we dont care about the ordering of nodes
 		//    but then the structure of the graph wont matter, only content
 		List<Integer> hash = new ArrayList<>();
-		hash.addAll(start.getValue());//this might double-count first node?
 		Iterator<NeoAtom> it = new DepthFirstIterator<NeoAtom,DefaultEdge>(graph,start);
 		while(it.hasNext()) {
 			NeoAtom next = it.next();
-			for (int i = 0; i < hash.size(); i++) {
-				//TODO some sort of rollover?
-				hash.set(i, hash.get(i)+next.getValue().get(i));
+			List<Integer> value;
+			try {
+				value = objectMapper.readValue(next.getValue(), new TypeReference<List<Integer>>(){});
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			if (hash.size() == 0) {
+				//use this value as a starting hash
+				hash.addAll(value);
+			} else {
+				//combine it with the has thats already thre
+				for (int i = 0; i < hash.size(); i++) {
+					//TODO some sort of rollover?
+					hash.set(i, hash.get(i)+value.get(i));
+				}
 			}
 		}
 		return Collections.unmodifiableList(hash);
