@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>NeoMolecule</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.js" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.min.css" />
+</head>
+<body>
+<div id="graph"></div>
+<script>
+  $.get(window.location.href , function(DOTstring) {
+    var parsedData = vis.network.convertDot(DOTstring);
+    var data = {
+      nodes: parsedData.nodes,
+      edges: parsedData.edges
+    }
+    var options = parsedData.options;
+    var network = new vis.Network(document.getElementById("graph"), data, options);
+    }, "text");
+</script>
+</body>
+</html>

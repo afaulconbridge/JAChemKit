@@ -15,7 +15,7 @@ public class MoleculeController {
 	@Autowired
 	private MoleculeRepository moleculerepository;
 	
-    @RequestMapping("molecule/{id}")
+    @RequestMapping("molecules/{id}")
     public String greeting(@PathVariable Long id, Model model) {
         model.addAttribute("mol", moleculerepository.findOne(id));
         return "molecule";
