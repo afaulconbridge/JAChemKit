@@ -16,56 +16,60 @@ public class TestReactor {
 	
 	@Test
 	public void simpleTest() {
-		Molecule molA = new MoleculeBuilder().fromElement(Coordinate.from(0,0), "A").build();
-		Molecule molB = new MoleculeBuilder().fromElement(Coordinate.from(0,0), "B").build();
+		Molecule<String> molA = new MoleculeBuilder<String>().fromElement(0,0, "A").build();
+		Molecule<String> molB = new MoleculeBuilder<String>().fromElement(0,0, "B").build();
 
 		// make sure they are the right way around
 		if (molA.compareTo(molB) > 0) {
-			Molecule temp = molA;
+			Molecule<String> temp = molA;
 			molA = molB;
 			molB = temp;
 		}
 		AsciiRenderer renderer = new AsciiRenderer();
 		
-		Reactor reactor = new Reactor();
-		Set<Reaction> reactions = reactor.getReactions(molA, molB);
-		for (Reaction reaction : reactions) {
+		Reactor<String> reactor = new Reactor<>();
+		Set<Reaction<String>> reactions = reactor.getReactions(molA, molB);
+		for (Reaction<String> reaction : reactions) {
 			log.info("new reaction");
 			log.info(renderer.toAscii(molA));
 			log.info(renderer.toAscii(molB));
-			for (Molecule product : reaction.getProducts()) {
+			for (Molecule<String> product : reaction.getProducts()) {
 				log.info(renderer.toAscii(product));
 			}
 		}
 	}
 	@Test
 	public void moderateTest() {
-		Molecule molA = new MoleculeBuilder()
-				.fromElement(Coordinate.from(0,0), "A")
-				.fromElement(Coordinate.from(0,1), "A")
-				.fromElement(Coordinate.from(1,1), "A")
+		Molecule<String> molA = new MoleculeBuilder<String>()
+				.fromElement(0,0, "A")
+				.fromElement(0,1, "A")
+				.fromBond(0,0, 0,1)
+				.fromElement(1,1, "A")
+				.fromBond(0,1, 1,1)
 				.build();
-		Molecule molB = new MoleculeBuilder()
-				.fromElement(Coordinate.from(0,0), "B")
-				.fromElement(Coordinate.from(0,1), "B")
-				.fromElement(Coordinate.from(0,2), "B")
+		Molecule<String> molB = new MoleculeBuilder<String>()
+				.fromElement(0,0, "B")
+				.fromElement(1,0, "B")
+				.fromBond(0,0, 1,0)
+				.fromElement(2,0, "B")
+				.fromBond(1,0, 2,0)
 				.build();
 
 		// make sure they are the right way around
 		if (molA.compareTo(molB) > 0) {
-			Molecule temp = molA;
+			Molecule<String> temp = molA;
 			molA = molB;
 			molB = temp;
 		}
 		AsciiRenderer renderer = new AsciiRenderer();
 		
-		Reactor reactor = new Reactor();
-		Set<Reaction> reactions = reactor.getReactions(molA, molB);
-		for (Reaction reaction : reactions) {
+		Reactor<String> reactor = new Reactor<>();
+		Set<Reaction<String>> reactions = reactor.getReactions(molA, molB);
+		for (Reaction<String> reaction : reactions) {
 			log.info("new reaction");
 			log.info(renderer.toAscii(molA));
 			log.info(renderer.toAscii(molB));
-			for (Molecule product : reaction.getProducts()) {
+			for (Molecule<String> product : reaction.getProducts()) {
 				log.info(renderer.toAscii(product));
 			}
 		}

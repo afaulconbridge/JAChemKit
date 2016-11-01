@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AsciiRenderer {
 
-	public String toAscii(Molecule mol) {
+	public String toAscii(Molecule<String> mol) {
 		StringBuilder sb = new StringBuilder();
 		//print top edge
 		sb.append("+");
@@ -18,8 +18,8 @@ public class AsciiRenderer {
 			//print element
 			sb.append("|");
 			for (int x = 0; x < mol.getWidth(); x++) {
-				if (mol.getElement(x, y).isPresent()) {
-					sb.append(mol.getElement(x,y).get());
+				if (mol.has(x, y)) {
+					sb.append(mol.getElement(x,y));
 				} else {
 					sb.append(" ");
 				}

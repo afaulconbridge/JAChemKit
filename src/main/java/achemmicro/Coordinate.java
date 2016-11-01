@@ -36,7 +36,13 @@ public class Coordinate implements Comparable<Coordinate> {
 		}
 	}	
 	
-	public static Coordinate from(int x, int y) {
+	@Override
+	public String toString() {
+		return "Coordinate("+x+","+y+")";
+	}
+	
+	
+	public static Coordinate from(Integer x, Integer y) {
 		return new Coordinate(x,y);
 	}
 }

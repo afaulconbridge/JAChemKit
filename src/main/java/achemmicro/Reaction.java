@@ -5,21 +5,21 @@ import java.util.Objects;
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.Multiset;
 
-public class Reaction {
+public class Reaction<T extends Comparable<T>> {
 	
-	private final ImmutableSortedMultiset<Molecule> reactants;
-	private final ImmutableSortedMultiset<Molecule> products;
+	private final ImmutableSortedMultiset<Molecule<T>> reactants;
+	private final ImmutableSortedMultiset<Molecule<T>> products;
 
-	protected Reaction(Multiset<Molecule> reactants, Multiset<Molecule> products) {
+	protected Reaction(Multiset<Molecule<T>> reactants, Multiset<Molecule<T>> products) {
 		this.reactants = ImmutableSortedMultiset.copyOf(reactants);
 		this.products = ImmutableSortedMultiset.copyOf(products);
 	}
 	
-	public ImmutableSortedMultiset<Molecule> getReactants() {
+	public ImmutableSortedMultiset<Molecule<T>> getReactants() {
 		return reactants;
 	}
 
-	public ImmutableSortedMultiset<Molecule> getProducts() {
+	public ImmutableSortedMultiset<Molecule<T>> getProducts() {
 		return products;
 	}
 
@@ -29,7 +29,7 @@ public class Reaction {
         if (!(o instanceof Reaction)) {
             return false;
         }
-        Reaction other = (Reaction) o;
+        Reaction<?> other = (Reaction<?>) o;
         return Objects.equals(this.reactants, other.reactants) && Objects.equals(this.products, other.products);
     }
 
@@ -38,7 +38,7 @@ public class Reaction {
         return Objects.hash(this.reactants, this.products);
     }
     
-	public static Reaction build(Multiset<Molecule> reactants, Multiset<Molecule> products) {
-		return new Reaction(reactants, products);
+	public static <T extends Comparable<T>> Reaction<T> build(Multiset<Molecule<T>> reactants, Multiset<Molecule<T>> products) {
+		return new Reaction<T>(reactants, products);
 	}
 }
