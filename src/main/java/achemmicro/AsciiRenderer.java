@@ -14,7 +14,7 @@ public class AsciiRenderer {
 		}
 		sb.append("+\n");
 		//for each row
-		for (int y = mol.getHeight()-1; y >=0; y--) {
+		for (int y = 0; y < mol.getHeight(); y++) {
 			//print element
 			sb.append("|");
 			for (int x = 0; x < mol.getWidth(); x++) {

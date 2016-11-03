@@ -1,5 +1,6 @@
 package achemmicro;
 
+import java.util.Collection;
 import java.util.Objects;
 
 import com.google.common.collect.ImmutableSortedMultiset;
@@ -10,9 +11,9 @@ public class Reaction<T extends Comparable<T>> {
 	private final ImmutableSortedMultiset<Molecule<T>> reactants;
 	private final ImmutableSortedMultiset<Molecule<T>> products;
 
-	protected Reaction(Multiset<Molecule<T>> reactants, Multiset<Molecule<T>> products) {
-		this.reactants = ImmutableSortedMultiset.copyOf(reactants);
-		this.products = ImmutableSortedMultiset.copyOf(products);
+	protected Reaction(ImmutableSortedMultiset<Molecule<T>> reactants, ImmutableSortedMultiset<Molecule<T>> products) {
+		this.reactants = reactants;
+		this.products = products;
 	}
 	
 	public ImmutableSortedMultiset<Molecule<T>> getReactants() {
@@ -38,7 +39,7 @@ public class Reaction<T extends Comparable<T>> {
         return Objects.hash(this.reactants, this.products);
     }
     
-	public static <T extends Comparable<T>> Reaction<T> build(Multiset<Molecule<T>> reactants, Multiset<Molecule<T>> products) {
-		return new Reaction<T>(reactants, products);
+	public static <T extends Comparable<T>> Reaction<T> build(Collection<Molecule<T>> reactants, Collection<Molecule<T>> products) {
+		return new Reaction<T>(ImmutableSortedMultiset.copyOf(reactants), ImmutableSortedMultiset.copyOf(products));
 	}
 }

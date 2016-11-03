@@ -1,14 +1,15 @@
 package achemmicro;
 
-import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multiset;
 import com.google.common.collect.SortedMultiset;
 import com.google.common.collect.TreeMultiset;
 
@@ -16,7 +17,7 @@ public class Reactor<T extends Comparable<T>> {
 
 	private final Logger log = Logger.getLogger(this.getClass());
 
-	public Set<Reaction<T>> getReactions(Molecule<T> molA, Molecule<T> molB) {
+	public Multiset<Reaction<T>> getReactions(Molecule<T> molA, Molecule<T> molB) {
 		// make sure they are the right way around
 		if (molA.compareTo(molB) > 0) {
 			Molecule<T> temp = molA;
@@ -27,7 +28,7 @@ public class Reactor<T extends Comparable<T>> {
 		reactants.add(molA);
 		reactants.add(molB);
 		
-		Set<Reaction<T>> reactions = new HashSet<>();
+		Multiset<Reaction<T>> reactions = HashMultiset.create();
 		// now slide the second one over the first in all possible coordinate
 		// sets
 		for (int y = 0 - molA.height; y <= molA.height; y++) {
@@ -46,7 +47,7 @@ public class Reactor<T extends Comparable<T>> {
 							newElements.put(cNew, Element.build(molA.getElement(c)));
 						}
 					}
-					Set<Set<Coordinate>> newBonds = new HashSet<>();
+					Set<ImmutableSet<Coordinate>> newBonds = new HashSet<>();
 					newBonds.addAll(molB.getBonds());
 					for (Set<Coordinate> bond : molA.getBonds()) {
 						Set<Coordinate> newBond = new HashSet<>();
@@ -55,25 +56,34 @@ public class Reactor<T extends Comparable<T>> {
 							//check coordinate has an element
 							newBond.add(cNew);
 						}
-						newBonds.add(newBond);
+						newBonds.add(ImmutableSet.copyOf(newBond));
 					}
 					
 					//now we have a set of coordinates, but they may not join into a single continuous molecule
 					//the molecule builder will handle that for us
 					
-					//we can create a product molecule now
 					//TODO check bonding is possible
 					//TOOD validate all existing bonds
-					Molecule<T> product = Molecule.build(newElements, newBonds);
-
+					
+					
+					//product as a single, possibly non-continuous, molecule
+					Molecule<T> intermediate = Molecule.build(newElements, newBonds);
 					//AsciiRenderer renderer = new AsciiRenderer();
 					//log.info(renderer.toAscii(product));
-					
-					SortedMultiset<Molecule<T>> products = TreeMultiset.create();
-					products.add(product);
-					
-					Reaction<T> reaction = Reaction.<T>build(reactants, products);
-					reactions.add(reaction);
+
+
+					MoleculeBuilder<T> builder = new MoleculeBuilder<>();
+					for (Coordinate c : newElements.keySet()) {
+						builder.fromElement(c, newElements.get(c));
+					}
+					for (Coordinate c : newElements.keySet()) {
+						for (ImmutableSet<Coordinate> bond : newBonds) {
+							if (bond.contains(c)) {
+								builder.fromBond(bond);
+							}
+						}
+					}			
+					reactions.add(Reaction.<T>build(reactants, builder.buildAll()));
 					
 				} catch (DuplicateCoordinateException e) {
 					// duplicate coordinate, allow to fail gracefully

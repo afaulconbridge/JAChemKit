@@ -8,9 +8,11 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.google.common.collect.Multiset;
+
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class TestReactor {
+public class ReactorTest {
 
 	private final Logger log = Logger.getLogger(this.getClass());
 	
@@ -28,7 +30,7 @@ public class TestReactor {
 		AsciiRenderer renderer = new AsciiRenderer();
 		
 		Reactor<String> reactor = new Reactor<>();
-		Set<Reaction<String>> reactions = reactor.getReactions(molA, molB);
+		Multiset<Reaction<String>> reactions = reactor.getReactions(molA, molB);
 		for (Reaction<String> reaction : reactions) {
 			log.info("new reaction");
 			log.info(renderer.toAscii(molA));
@@ -37,7 +39,9 @@ public class TestReactor {
 				log.info(renderer.toAscii(product));
 			}
 		}
+		//TODO finish test
 	}
+	
 	@Test
 	public void moderateTest() {
 		Molecule<String> molA = new MoleculeBuilder<String>()
@@ -64,7 +68,7 @@ public class TestReactor {
 		AsciiRenderer renderer = new AsciiRenderer();
 		
 		Reactor<String> reactor = new Reactor<>();
-		Set<Reaction<String>> reactions = reactor.getReactions(molA, molB);
+		Multiset<Reaction<String>> reactions = reactor.getReactions(molA, molB);
 		for (Reaction<String> reaction : reactions) {
 			log.info("new reaction");
 			log.info(renderer.toAscii(molA));

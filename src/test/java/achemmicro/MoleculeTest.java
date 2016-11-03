@@ -14,11 +14,9 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.google.common.collect.Collections2;
-
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class TestMolecule {
+public class MoleculeTest {
 	
 	@Test
 	public void simpleTest() {
@@ -48,7 +46,7 @@ public class TestMolecule {
 	@Test
 	public void graphTest() {
 
-		Molecule mol = new MoleculeBuilder<String>()
+		Molecule<String> mol = new MoleculeBuilder<String>()
 				.fromElement(0,1, "A")
 				.fromElement(1,1, "D")
 				.fromElement(2,1, "E")

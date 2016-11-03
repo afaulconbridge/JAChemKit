@@ -2,15 +2,11 @@ package achemmicro;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.SortedMap;
@@ -18,7 +14,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
 
@@ -181,7 +176,7 @@ public class Molecule<T extends Comparable<T>> implements Comparable<Molecule<T>
 		return 0;
 	}
         
-	public static <T extends Comparable<T>> Molecule<T> build(Map<Coordinate,Element<T>> elements, Set<Set<Coordinate>> bonds) {
+	public static <T extends Comparable<T>> Molecule<T> build(Map<Coordinate,Element<T>> elements, Set<? extends Set<Coordinate>> bonds) {
 		//work out the min and max coordinates
 		int minX = elements.keySet().stream().map(c -> c.x).min((a,b) -> Integer.compare(a,b)).get();
 		int minY = elements.keySet().stream().map(c -> c.y).min((a,b) -> Integer.compare(a,b)).get();

@@ -10,13 +10,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class TestAsciiRenderer {
+public class AsciiRendererTest {
 
 	private final Logger log = Logger.getLogger(this.getClass());
 	
 	@Test
 	public void simpleTest() {
-		Molecule mol = new MoleculeBuilder().fromElement(Coordinate.from(0,0), "A").build();
+		Molecule<String> mol = new MoleculeBuilder<String>().fromElement(Coordinate.from(0,0), "A").build();
 		
 		AsciiRenderer renderer = new AsciiRenderer();
 		log.info("\n"+renderer.toAscii(mol));
@@ -24,13 +24,18 @@ public class TestAsciiRenderer {
 				   + "|A|\n"
 				   + "+-+", renderer.toAscii(mol));
 
-		mol = new MoleculeBuilder()
+		mol = new MoleculeBuilder<String>()
 				.fromElement(Coordinate.from(0,1), "A")
 				.fromElement(Coordinate.from(1,1), "A")
 				.fromElement(Coordinate.from(2,1), "A")
 				.fromElement(Coordinate.from(0,0), "B")
 				.fromElement(Coordinate.from(2,2), "B")
+				.fromBond(0,0, 0,1)
+				.fromBond(0,1, 1,1)
+				.fromBond(1,1, 2,1)
+				.fromBond(2,1, 2,2)
 				.build();
+		assertEquals("B", mol.getElement(0, 0));		
 		log.info("\n"+renderer.toAscii(mol));
 		assertEquals("+---+\n"
 				   + "|B  |\n"
