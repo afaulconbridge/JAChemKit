@@ -32,7 +32,6 @@ public class ReactorTest {
 			log.info(renderer.toAscii(molA)+"\n"+renderer.toAscii(molB));
 			log.info(renderer.toAscii(reaction.getIntermediate()));
 			StringBuilder sb = new StringBuilder();
-			log.info(reaction.getProducts());
 			for (Molecule<String> product : reaction.getProducts()) {
 				sb.append(renderer.toAscii(product));
 			}
