@@ -1,6 +1,9 @@
-package achemmicro;
+package achemmicro.bonding;
 
 import java.util.Set;
+
+import achemmicro.Coordinate;
+import achemmicro.Molecule;
 
 public interface BondTester<T extends Comparable<T>> {
 

@@ -11,6 +11,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 
+import achemmicro.bonding.LocalGraphBondTester;
+
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
