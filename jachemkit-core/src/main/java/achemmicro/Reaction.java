@@ -1,6 +1,5 @@
 package achemmicro;
 
-import java.util.Collection;
 import java.util.Objects;
 
 import com.google.common.collect.ImmutableSortedMultiset;

@@ -16,7 +16,6 @@ public class CoordinateTest {
 		Coordinate elemA = Coordinate.from(0,0);
 		Coordinate elemA2 = Coordinate.from(0,0);
 		Coordinate elemB = Coordinate.from(0,1);
-		Coordinate elemC = Coordinate.from(1,0);
 		
 
 		Assert.assertTrue("A must equal A2", elemA.equals(elemA2));

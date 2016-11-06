@@ -8,10 +8,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-
 import org.junit.Assert;
 
 @SpringBootTest
