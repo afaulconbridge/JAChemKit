@@ -1,13 +1,8 @@
 package achemmicro;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -81,7 +76,10 @@ public class Molecule<T extends Comparable<T>> implements Comparable<Molecule<T>
 		return elements.get(coord).value;
 	}
 	
-	
+
+	public ImmutableSortedSet<Coordinate> getBondedFrom(int x, int y) {
+		return getBondedFrom(Coordinate.from(x,y));
+	}
 	public ImmutableSortedSet<Coordinate> getBondedFrom(Coordinate start) {
 		SortedSet<Coordinate> toReturn = new TreeSet<>();
 		for (SortedSet<Coordinate> bond : bonds) {
@@ -93,30 +91,6 @@ public class Molecule<T extends Comparable<T>> implements Comparable<Molecule<T>
 		toReturn.remove(start);
 		return ImmutableSortedSet.copyOf(toReturn);
 	}
-	
-	public List<T> getGraphFrom(int x, int y) {
-		return getGraphFrom(Coordinate.from(x,y));
-	}
-	public  List<T> getGraphFrom(Coordinate start) {
-		Queue<Coordinate> locations = new ArrayDeque<>();
-		Set<Coordinate> visited = new HashSet<>();
-		List<T> output = new ArrayList<>();
-		locations.add(start);
-		while (locations.peek() != null) {			
-			//visit a location
-			Coordinate loc = locations.poll();
-			visited.add(loc);
-			output.add(getElement(loc));
-			//get any neighbours of that location
-			for (Coordinate other : getBondedFrom(loc)) {
-				if (!visited.contains(other) && !locations.contains(other)) {
-					locations.add(other);
-				}				
-			}
-		}
-		return output;
-	}
-
 
     @Override
     public boolean equals(Object o) {
@@ -131,7 +105,7 @@ public class Molecule<T extends Comparable<T>> implements Comparable<Molecule<T>
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.elements);
+        return Objects.hash(this.elements, this.bonds);
     }
 
 	@Override
@@ -167,13 +141,31 @@ public class Molecule<T extends Comparable<T>> implements Comparable<Molecule<T>
 			T otherElement = other.getElement(otherCoord);
 			cmp = thisElement.compareTo(otherElement);
 			if (cmp != 0) {
-				return 0;
+				return cmp;
 			}
 		}
 		//has the same coordinates at the same order
 		//go by bonding
 		//TODO finish
 		return 0;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Molecule(");
+		for (Coordinate c : elements.keySet()) {
+			sb.append("(");
+			sb.append(c.x);
+			sb.append(",");
+			sb.append(c.y);
+			sb.append("=");
+			sb.append(elements.get(c));
+			sb.append(")");
+		}
+		sb.append(")");
+		return sb.toString();
+		
 	}
         
 	public static <T extends Comparable<T>> Molecule<T> build(Map<Coordinate,Element<T>> elements, Set<? extends Set<Coordinate>> bonds) {

@@ -10,14 +10,20 @@ public class Reaction<T extends Comparable<T>> {
 	
 	private final ImmutableSortedMultiset<Molecule<T>> reactants;
 	private final ImmutableSortedMultiset<Molecule<T>> products;
+	private final Molecule<T> intermediate;
 
-	protected Reaction(ImmutableSortedMultiset<Molecule<T>> reactants, ImmutableSortedMultiset<Molecule<T>> products) {
+	protected Reaction(ImmutableSortedMultiset<Molecule<T>> reactants,  Molecule<T> intermediate, ImmutableSortedMultiset<Molecule<T>> products) {
 		this.reactants = reactants;
+		this.intermediate = intermediate;
 		this.products = products;
 	}
 	
 	public ImmutableSortedMultiset<Molecule<T>> getReactants() {
 		return reactants;
+	}
+
+	public Molecule<T> getIntermediate() {
+		return intermediate;
 	}
 
 	public ImmutableSortedMultiset<Molecule<T>> getProducts() {
@@ -31,15 +37,17 @@ public class Reaction<T extends Comparable<T>> {
             return false;
         }
         Reaction<?> other = (Reaction<?>) o;
-        return Objects.equals(this.reactants, other.reactants) && Objects.equals(this.products, other.products);
+        return Objects.equals(this.reactants, other.reactants)
+        		&& Objects.equals(this.intermediate, other.intermediate)
+        		&& Objects.equals(this.products, other.products);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.reactants, this.products);
+        return Objects.hash(this.reactants, intermediate, this.products);
     }
     
-	public static <T extends Comparable<T>> Reaction<T> build(Collection<Molecule<T>> reactants, Collection<Molecule<T>> products) {
-		return new Reaction<T>(ImmutableSortedMultiset.copyOf(reactants), ImmutableSortedMultiset.copyOf(products));
+	public static <T extends Comparable<T>> Reaction<T> build(Multiset<Molecule<T>> reactants, Molecule<T> intermediate, Multiset<Molecule<T>> products) {
+		return new Reaction<T>(ImmutableSortedMultiset.copyOf(reactants), intermediate, ImmutableSortedMultiset.copyOf(products));
 	}
 }

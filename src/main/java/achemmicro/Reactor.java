@@ -2,6 +2,7 @@ package achemmicro;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,6 +17,11 @@ import com.google.common.collect.TreeMultiset;
 public class Reactor<T extends Comparable<T>> {
 
 	private final Logger log = Logger.getLogger(this.getClass());
+	private final BondTester<T> bondTester;
+	
+	public Reactor(BondTester<T> bondTester) {
+		this.bondTester = bondTester;
+	}
 
 	public Multiset<Reaction<T>> getReactions(Molecule<T> molA, Molecule<T> molB) {
 		// make sure they are the right way around
@@ -53,7 +59,6 @@ public class Reactor<T extends Comparable<T>> {
 						Set<Coordinate> newBond = new HashSet<>();
 						for (Coordinate c : bond) {
 							Coordinate cNew = Coordinate.from(c.x + x, c.y + y);
-							//check coordinate has an element
 							newBond.add(cNew);
 						}
 						newBonds.add(ImmutableSet.copyOf(newBond));
@@ -62,12 +67,20 @@ public class Reactor<T extends Comparable<T>> {
 					//now we have a set of coordinates, but they may not join into a single continuous molecule
 					//the molecule builder will handle that for us
 					
+					//intermediate as a single, possibly non-continuous, molecule
+					Molecule<T> intermediate = Molecule.build(newElements, newBonds);
+					
 					//TODO check bonding is possible
 					//TOOD validate all existing bonds
+					Iterator<ImmutableSet<Coordinate>> newBondsIter = newBonds.iterator();
+					while (newBondsIter.hasNext()) {
+						ImmutableSet<Coordinate> bond = newBondsIter.next();
+						if (!bondTester.testBond(intermediate, bond)) {
+							newBondsIter.remove();
+						}
+					}
 					
 					
-					//product as a single, possibly non-continuous, molecule
-					Molecule<T> intermediate = Molecule.build(newElements, newBonds);
 					//AsciiRenderer renderer = new AsciiRenderer();
 					//log.info(renderer.toAscii(product));
 
@@ -76,14 +89,12 @@ public class Reactor<T extends Comparable<T>> {
 					for (Coordinate c : newElements.keySet()) {
 						builder.fromElement(c, newElements.get(c));
 					}
-					for (Coordinate c : newElements.keySet()) {
-						for (ImmutableSet<Coordinate> bond : newBonds) {
-							if (bond.contains(c)) {
-								builder.fromBond(bond);
-							}
-						}
-					}			
-					reactions.add(Reaction.<T>build(reactants, builder.buildAll()));
+					for (ImmutableSet<Coordinate> bond : newBonds) {
+						builder.fromBond(bond);
+					}	
+					Multiset<Molecule<T>> products = builder.buildAll();
+					Reaction<T> reaction = Reaction.<T>build(reactants, intermediate, products); 
+					reactions.add(reaction);
 					
 				} catch (DuplicateCoordinateException e) {
 					// duplicate coordinate, allow to fail gracefully

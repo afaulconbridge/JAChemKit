@@ -28,6 +28,10 @@ public class Element<T extends Comparable<T>> {
 	public int compareTo(Element<T> other) {
 		return this.value.compareTo(other.value);
 	}
+	@Override
+	public String toString() {
+		return "Element("+value+")";
+	}
 	
 	public static <T extends Comparable<T>> Element<T> build(T value) {
 		//TODO cache 

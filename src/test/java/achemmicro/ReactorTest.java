@@ -1,14 +1,17 @@
 package achemmicro;
 
-import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
+
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -20,24 +23,22 @@ public class ReactorTest {
 	public void simpleTest() {
 		Molecule<String> molA = new MoleculeBuilder<String>().fromElement(0,0, "A").build();
 		Molecule<String> molB = new MoleculeBuilder<String>().fromElement(0,0, "B").build();
-
-		// make sure they are the right way around
-		if (molA.compareTo(molB) > 0) {
-			Molecule<String> temp = molA;
-			molA = molB;
-			molB = temp;
-		}
+		ImmutableMultiset<Molecule<String>> reactants = ImmutableMultiset.of(molA, molB);
 		AsciiRenderer renderer = new AsciiRenderer();
-		
-		Reactor<String> reactor = new Reactor<>();
+		Reactor<String> reactor = new Reactor<>(new LocalGraphBondTester<String>());
 		Multiset<Reaction<String>> reactions = reactor.getReactions(molA, molB);
 		for (Reaction<String> reaction : reactions) {
 			log.info("new reaction");
-			log.info(renderer.toAscii(molA));
-			log.info(renderer.toAscii(molB));
+			log.info(renderer.toAscii(molA)+"\n"+renderer.toAscii(molB));
+			log.info(renderer.toAscii(reaction.getIntermediate()));
+			StringBuilder sb = new StringBuilder();
+			log.info(reaction.getProducts());
 			for (Molecule<String> product : reaction.getProducts()) {
-				log.info(renderer.toAscii(product));
+				sb.append(renderer.toAscii(product));
 			}
+			log.info(sb.toString());
+			
+			Assert.assertEquals("Reactants must be preserved", reactants, reaction.getReactants());
 		}
 		//TODO finish test
 	}
@@ -67,12 +68,12 @@ public class ReactorTest {
 		}
 		AsciiRenderer renderer = new AsciiRenderer();
 		
-		Reactor<String> reactor = new Reactor<>();
+		Reactor<String> reactor = new Reactor<>(new LocalGraphBondTester<String>());
 		Multiset<Reaction<String>> reactions = reactor.getReactions(molA, molB);
 		for (Reaction<String> reaction : reactions) {
 			log.info("new reaction");
-			log.info(renderer.toAscii(molA));
-			log.info(renderer.toAscii(molB));
+			log.info(renderer.toAscii(molA)+"\n"+renderer.toAscii(molB));
+			log.info(renderer.toAscii(reaction.getIntermediate()));
 			for (Molecule<String> product : reaction.getProducts()) {
 				log.info(renderer.toAscii(product));
 			}

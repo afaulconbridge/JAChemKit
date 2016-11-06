@@ -63,6 +63,7 @@ public class MoleculeBuilder<T extends Comparable<T>> {
 		Multiset<Molecule<T>> molecules = HashMultiset.create();
 		Set<ImmutableSet<Coordinate>> components = findComponents();
 		for (ImmutableSet<Coordinate> component : components) {
+			//use a new builder for each component
 			MoleculeBuilder<T> builder = new MoleculeBuilder<>();
 			//feed the elements to the builder
 			for (Coordinate c : component) {
@@ -81,7 +82,7 @@ public class MoleculeBuilder<T extends Comparable<T>> {
 		return molecules;
 	}
 	
-	private Set<ImmutableSet<Coordinate>> findComponents() {
+	public ImmutableSet<ImmutableSet<Coordinate>> findComponents() {
 		//create a distinct component for each element
 		Set<ImmutableSet<Coordinate>> components = new HashSet<>();
 		for (Coordinate c : elements.keySet()) {
@@ -105,7 +106,7 @@ public class MoleculeBuilder<T extends Comparable<T>> {
 			}
 			components.add(ImmutableSet.copyOf(newComponent));
 		}
-		return components;
+		return ImmutableSet.copyOf(components);
 	}
 	
 	private boolean intersectionExists(Set<?> setA, Set<?> setB) {
