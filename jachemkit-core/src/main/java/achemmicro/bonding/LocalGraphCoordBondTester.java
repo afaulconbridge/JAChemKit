@@ -13,7 +13,6 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.apache.log4j.Logger;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.hash.HashFunction;
@@ -23,25 +22,22 @@ import com.google.common.hash.Hashing;
 import achemmicro.Coordinate;
 import achemmicro.Molecule;
 /**
- * Tests bonds by looking at the local bonding graph
- * and randomly assigneing particular graphs sucess or failure.
- * 
- *  Note that this does not take the coordinates of the molecules into account in any way, only the 
- *  bonding graphs
+ * Tests bonds by looking at the local bonding graph and layout
+ * and randomly assigneing particular patterns sucess or failure.
  * 
  * @author Adam
  *
  * @param <T>
  */
-public class LocalGraphBondTester<T extends Comparable<T>> implements BondTester<T> {
+public class LocalGraphCoordBondTester<T extends Comparable<T>> implements BondTester<T> {
 
 	private final Logger log = Logger.getLogger(this.getClass());
 	
 	private final double bondProb;
 	//this needs to be concurrent map so that multiple threads can test against it at once
-	private final ConcurrentMap<ImmutableSet<ImmutableList<T>>, Boolean> historic = new ConcurrentHashMap<>();
+	private final ConcurrentMap<ImmutableSet<List<T>>, Boolean> historic = new ConcurrentHashMap<>();
 	
-	public LocalGraphBondTester() {
+	public LocalGraphCoordBondTester() {
 		bondProb = 0.1;
 	}
 
@@ -51,24 +47,21 @@ public class LocalGraphBondTester<T extends Comparable<T>> implements BondTester
 		if (bond == null)  throw new IllegalArgumentException("bond must not be null");
 		if (bond.size() != 2) throw new IllegalArgumentException("bond must be two coordinates");
 		
-		Set<ImmutableList<T>> localGraphs = new HashSet<>();
+		Set<List<Coordinate>> localGraphs = new HashSet<>();
 		for (Coordinate end : bond) {
 			if (!molecule.has(end)) throw new IllegalArgumentException("bond must be in molecule");
-			List<T> localGraph = new ArrayList<>();
-			for (Coordinate c : getGraphFrom(molecule, end, bond)) {
-				localGraph.add(molecule.getElement(c));
-			}
-			localGraphs.add(ImmutableList.copyOf(localGraph));
+			
+			localGraphs.add(getGraphFrom(molecule, end, bond));
 		}
-		ImmutableSet<ImmutableList<T>> localGraphFixed = ImmutableSet.copyOf(localGraphs);
+		ImmutableSet<List<Coordinate>> localGraphFixed = ImmutableSet.copyOf(localGraphs);
 		if (!historic.containsKey(localGraphFixed)) {
 			//create a new random number generated based on the hash of the local graphs
 			//need an evenly distributed hash, suitable for seeding an RNG
 			HashFunction hashFunction = Hashing.murmur3_128();
 			Hasher hasher = hashFunction.newHasher();
-			for (List<T> l : localGraphFixed) {
-				for (T t : l) {
-					hasher.putInt(t.hashCode());
+			for (List<Coordinate> l : localGraphFixed) {
+				for (Coordinate c : l) {
+					hasher.putInt(molecule.getElement(c).hashCode());
 				}
 			}			
 			Random rng = new Random(hasher.hash().padToLong());
