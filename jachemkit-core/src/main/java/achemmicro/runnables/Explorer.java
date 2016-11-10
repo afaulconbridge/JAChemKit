@@ -34,6 +34,7 @@ public class Explorer {
 		molecularSpecies.add(new MoleculeBuilder<String>().fromElement(0, 0, "C").build());
 		molecularSpecies.add(new MoleculeBuilder<String>().fromElement(0, 0, "D").build());
 		molecularSpecies.add(new MoleculeBuilder<String>().fromElement(0, 0, "E").build());
+		/*
 		molecularSpecies.add(new MoleculeBuilder<String>().fromElement(0, 0, "F").build());
 		molecularSpecies.add(new MoleculeBuilder<String>().fromElement(0, 0, "G").build());
 		molecularSpecies.add(new MoleculeBuilder<String>().fromElement(0, 0, "H").build());
@@ -55,6 +56,7 @@ public class Explorer {
 		molecularSpecies.add(new MoleculeBuilder<String>().fromElement(0, 0, "X").build());
 		molecularSpecies.add(new MoleculeBuilder<String>().fromElement(0, 0, "Y").build());
 		molecularSpecies.add(new MoleculeBuilder<String>().fromElement(0, 0, "Z").build());
+		*/
 		// create a queue of reactants to test
 		// TODO multithread safe and finite size here
 		Queue<ImmutableMultiset<Molecule<String>>> reactantsQueue = new LinkedList<>();
