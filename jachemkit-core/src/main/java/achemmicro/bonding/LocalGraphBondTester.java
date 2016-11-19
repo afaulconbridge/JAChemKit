@@ -38,11 +38,15 @@ public class LocalGraphBondTester<T extends Comparable<T>> implements BondTester
 	private final Logger log = Logger.getLogger(this.getClass());
 	
 	private final double bondProb;
+	private final int bondLocalGraphLength;
+	
+	
 	//this needs to be concurrent map so that multiple threads can test against it at once
 	private final ConcurrentMap<ImmutableSet<ImmutableList<T>>, Boolean> historic = new ConcurrentHashMap<>();
 	
 	public LocalGraphBondTester() {
 		bondProb = 0.1;
+		bondLocalGraphLength = 5;
 	}
 
 	@Override
@@ -57,6 +61,7 @@ public class LocalGraphBondTester<T extends Comparable<T>> implements BondTester
 			List<T> localGraph = new ArrayList<>();
 			for (Coordinate c : getGraphFrom(molecule, end, bond)) {
 				localGraph.add(molecule.getElement(c));
+				if (localGraph.size() >= bondLocalGraphLength) break;
 			}
 			localGraphs.add(ImmutableList.copyOf(localGraph));
 		}
